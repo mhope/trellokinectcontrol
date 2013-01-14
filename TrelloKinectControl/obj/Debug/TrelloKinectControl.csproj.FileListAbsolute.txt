@@ -1,0 +1,11 @@
+C:\Dev\TrelloKinectControl\TrelloKinectControl\bin\Debug\TrelloKinectControl.exe.config
+C:\Dev\TrelloKinectControl\TrelloKinectControl\bin\Debug\TrelloKinectControl.exe
+C:\Dev\TrelloKinectControl\TrelloKinectControl\bin\Debug\TrelloKinectControl.pdb
+C:\Dev\TrelloKinectControl\TrelloKinectControl\bin\Debug\CefSharp.dll
+C:\Dev\TrelloKinectControl\TrelloKinectControl\bin\Debug\CefSharp.WinForms.dll
+C:\Dev\TrelloKinectControl\TrelloKinectControl\obj\Debug\TrelloKinectControl.csprojResolveAssemblyReference.cache
+C:\Dev\TrelloKinectControl\TrelloKinectControl\obj\Debug\TrelloKinectControl.BrowserForm.resources
+C:\Dev\TrelloKinectControl\TrelloKinectControl\obj\Debug\TrelloKinectControl.Properties.Resources.resources
+C:\Dev\TrelloKinectControl\TrelloKinectControl\obj\Debug\TrelloKinectControl.csproj.GenerateResource.Cache
+C:\Dev\TrelloKinectControl\TrelloKinectControl\obj\Debug\TrelloKinectControl.exe
+C:\Dev\TrelloKinectControl\TrelloKinectControl\obj\Debug\TrelloKinectControl.pdb
