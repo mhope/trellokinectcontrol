@@ -22,9 +22,9 @@ namespace TrelloKinectControl.Gestures
             GetArmFrom(skeleton, out rightElbow, out rightHand, out rightShoulder);
 
             System.Diagnostics.Debug.WriteLine("#Processing gesture" + ++gestureCount);
-            System.Diagnostics.Debug.WriteLine(" - Shoulder: Y=" + Math.Round(rightShoulder.Y, 2) + ", Z=" + Math.Round(rightShoulder.Z, 2));
-            System.Diagnostics.Debug.WriteLine(" - Elbow: Y=" + Math.Round(rightElbow.Y, 2) + ", Z=" + Math.Round(rightElbow.Z, 2));
-            System.Diagnostics.Debug.WriteLine(" - Hand: Y=" + Math.Round(rightHand.Y, 2) + ", Z=" + Math.Round(rightHand.Z, 2));
+            System.Diagnostics.Debug.WriteLine(" - Shoulder: X=" + Math.Round(rightShoulder.X, 2)+ ", Y=" + Math.Round(rightShoulder.Y, 2) + ", Z=" + Math.Round(rightShoulder.Z, 2));
+            System.Diagnostics.Debug.WriteLine(" - Elbow: X=" + Math.Round(rightElbow.X, 2) + ", Y=" + Math.Round(rightElbow.Y, 2) + ", Z=" + Math.Round(rightElbow.Z, 2));
+            System.Diagnostics.Debug.WriteLine(" - Hand: X=" + Math.Round(rightHand.X, 2) + ", Y=" + Math.Round(rightHand.Y, 2) + ", Z=" + Math.Round(rightHand.Z, 2));
 
             System.Diagnostics.Debug.Write("# S<->H: " + Math.Round(rightShoulder.Y - rightHand.Y, 2));
             System.Diagnostics.Debug.Write(", H<->E: " + Math.Round(rightHand.Y - rightElbow.Y, 2));
@@ -79,11 +79,20 @@ namespace TrelloKinectControl.Gestures
             {
                 System.Diagnostics.Debug.Print("\t\t\tHand Up");
                 return Gesture.HandUp;
-            }
-            if (rightElbow.Y - rightHand.Y > 0.1)
+            } else if (rightElbow.Y - rightHand.Y > 0.1)
             {
                 System.Diagnostics.Debug.Print("\t\t\tHand Down");
                 return Gesture.HandDown;
+            }
+            else if (rightElbow.X - rightHand.X > 0.2)
+            {
+                System.Diagnostics.Debug.Print("\t\t\tHand Left");
+                return Gesture.HandLeft;
+            }
+            else if (rightHand.X - rightElbow.X > 0.2)
+            {
+                System.Diagnostics.Debug.Print("\t\t\tHand Right");
+                return Gesture.HandRight;
             }
             return Gesture.None;
         }

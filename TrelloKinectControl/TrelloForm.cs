@@ -37,7 +37,22 @@ namespace TrelloKinectControl
             browserContainer.ContentPanel.Controls.Add(webView);
 
             kinectControl = new KinectControl();
-            kinectControl.Initialize();
+        }
+
+        private void onOffButton_Click(object sender, EventArgs e)
+        {
+            if (onOffButton.Text == "Start")
+            {
+                onOffButton.Text = "Stop";
+                onOffButton.BackColor = Color.Red;
+                kinectControl.Start();
+            }
+            else
+            {
+                onOffButton.Text = "Start";
+                onOffButton.BackColor = Color.FromArgb(0, 192, 0);
+                kinectControl.Stop();
+            }
         }
     }
 }

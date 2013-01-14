@@ -18,13 +18,26 @@ namespace TrelloKinectControl.Kinect
 
         private GestureFinder gestureFinder;
 
-        public void Initialize()
+        public KinectControl()
         {
-            InitializeTrello();
-            InitializeKinect();
-            InitializeTimer();
             gestureFinder = new GestureFinder();
         }
+
+        public void Start()
+        {
+            InitializeKinect();
+            InitializeTimer();
+            InitializeTrello();
+        }
+        
+        public void Stop()
+        {
+            StopTimer();
+            // Give he last timer a chance before stopping the kinect
+            System.Threading.Thread.Sleep(700);
+            StopKinect();
+        }
+
 
         private void _poll_Frame(object sender, ElapsedEventArgs e)
         {
@@ -84,7 +97,7 @@ namespace TrelloKinectControl.Kinect
 
         private void PositionCursor()
         {
-            System.Windows.Forms.Cursor.Position = new System.Drawing.Point(200, 250);
+            System.Windows.Forms.Cursor.Position = new System.Drawing.Point(200, 190);
         }
 
         private void InitializeTimer()
@@ -96,5 +109,22 @@ namespace TrelloKinectControl.Kinect
         }
 
 
+        private void StopTimer()
+        {
+            if (timer != null)
+            {
+                timer.Stop();
+                timer = null;
+            }
+        }
+
+        private void StopKinect()
+        {
+            if (kinectSensor != null)
+            {
+                kinectSensor.Stop();
+                kinectSensor = null;
+            }
+        }
     }
 }
