@@ -32,12 +32,15 @@ namespace TrelloKinectControl.Gestures
             System.Diagnostics.Debug.Write("\n");
 
             // not interacting if hand not raise
-            if ((rightHand.Y == 0 && rightHand.Z == 0) || rightShoulder.Y - rightHand.Y > 0.5)
+            if (rightHand.Y == 0 && rightHand.Z == 0)
             {
                 return Gesture.NotInteracting;
             }
 
             System.Diagnostics.Debug.Print("\t\tInteracting");
+            if (IsArmHangingDown(skeleton)) {
+                return Gesture.Cancel;
+            }
             if (IsArmExtended(skeleton))
             {
                 System.Diagnostics.Debug.Print("\t\t\t\tExtended");
@@ -71,6 +74,16 @@ namespace TrelloKinectControl.Gestures
             {
                 return FindMovementGesture(ref rightElbow, ref rightHand);
             }
+        }
+
+        private bool IsArmHangingDown(Skeleton skeleton)
+        {
+            SkeletonPoint rightElbow;
+            SkeletonPoint rightShoulder;
+            SkeletonPoint rightHand;
+            GetArmFrom(skeleton, out rightElbow, out rightHand, out rightShoulder);
+            
+            return rightShoulder.Z - rightHand.Z < 0.1;
         }
 
         private static Gesture FindMovementGesture(ref SkeletonPoint rightElbow, ref SkeletonPoint rightHand)

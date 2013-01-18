@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TrelloKinectControl.Keyboard;
 using TrelloKinectControl.Mouse;
 
 namespace TrelloKinectControl.Gestures
@@ -15,13 +16,14 @@ namespace TrelloKinectControl.Gestures
         None,
         NotInteracting,
         PickUp,
-        PutDown
+        PutDown,
+        Cancel
     }
 
     public static class GestureExtensions
     {
-        private static int CARD_HEIGHT = 30;
-        private static int COLUMN_WIDTH = 125;
+        private static int CARD_HEIGHT = 60;
+        private static int COLUMN_WIDTH = 250;
         private static int MIN_Y = 190;
         private static int MIN_X = 200;
         private static int MAX_X = 640;
@@ -31,22 +33,7 @@ namespace TrelloKinectControl.Gestures
             {
                 case Gesture.PickUp:
                     MouseInterop.LeftDown();
-                    System.Threading.Thread.Sleep(20);
-                    MouseInterop.Move(0, 3);
-                    System.Threading.Thread.Sleep(20);
-                    MouseInterop.Move(0, 3);
-                    System.Threading.Thread.Sleep(20);
-                    MouseInterop.Move(0, 3);
-                    System.Threading.Thread.Sleep(20);
-                    MouseInterop.Move(0, 3);
-                    System.Threading.Thread.Sleep(20);
-                    MouseInterop.Move(0, -3);
-                    System.Threading.Thread.Sleep(20);
-                    MouseInterop.Move(0, -3);
-                    System.Threading.Thread.Sleep(20);
-                    MouseInterop.Move(0, -3);
-                    System.Threading.Thread.Sleep(20);
-                    MouseInterop.Move(0, -3);
+                    MouseInterop.Jiggle();
                     break;
                 case Gesture.PutDown:
                     MouseInterop.LeftUp();
@@ -71,6 +58,9 @@ namespace TrelloKinectControl.Gestures
                     {
                         MouseInterop.Move(COLUMN_WIDTH, 0);
                     }
+                    break;
+                case Gesture.Cancel:
+                    KeyboardInterop.Cancel();
                     break;
                 default:
                     break;

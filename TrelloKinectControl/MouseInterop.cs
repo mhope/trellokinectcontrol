@@ -67,6 +67,7 @@ namespace TrelloKinectControl.Mouse
 
         public static void ControlMouse(int dx, int dy, bool leftClick)
         {
+
             INPUT[] inputs = new INPUT[2];
 
             inputs[0] = new INPUT();
@@ -120,14 +121,18 @@ namespace TrelloKinectControl.Mouse
             LeftUp();
         }
 
-        public static void Move(int dx, int dy)
+        public static void Move(int x, int y)
         {
+
+            var dx = x * (65536 / System.Windows.SystemParameters.PrimaryScreenWidth);
+            var dy = y * (65536 / System.Windows.SystemParameters.PrimaryScreenHeight);
+
             INPUT[] inputs = new INPUT[1];
 
             inputs[0] = new INPUT();
             inputs[0].type = 0;
-            inputs[0].mi.dx = dx;
-            inputs[0].mi.dy = dy;
+            inputs[0].mi.dx = x;
+            inputs[0].mi.dy = y;
             inputs[0].mi.dwFlags = MOUSEEVENTF.MOVE;
 
             SendInput(inputs.Length, inputs, INPUT.Size);
@@ -149,6 +154,21 @@ namespace TrelloKinectControl.Mouse
             inputs[0].type = 0;
             inputs[0].mi.dwFlags = MOUSEEVENTF.LEFTUP;
             SendInput(inputs.Length, inputs, INPUT.Size);
+        }
+
+        internal static void Jiggle()
+        {
+            int loopCount = 4;
+            for (int i = 0; i < loopCount; i++)
+            {
+                System.Threading.Thread.Sleep(20);
+                Move(0, 3);
+            }
+            for (int j = loopCount; j > 0; j--)
+            {
+                System.Threading.Thread.Sleep(20);
+                Move(0, -3);
+            }
         }
     }
 }
