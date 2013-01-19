@@ -9,7 +9,7 @@ namespace TrelloKinectControl
     class SkeletonPoints
     {
         private SkeletonPoint head;
-        private SkeletonPoint shoulderCentre;
+        private SkeletonPoint spine;
         private SkeletonPoint shoulderRight;
         private SkeletonPoint elbowRight;
         private SkeletonPoint handRight;
@@ -17,43 +17,61 @@ namespace TrelloKinectControl
 
         public SkeletonPoints(
             SkeletonPoint head, 
-            SkeletonPoint shoulderCentre, 
+            SkeletonPoint spine, 
             SkeletonPoint shoulderRight, 
             SkeletonPoint elbowRight,
             SkeletonPoint wristRight, 
             SkeletonPoint handRight)
         {
             this.head = head;
-            this.shoulderCentre = shoulderCentre;
+            this.spine = spine;
             this.shoulderRight = shoulderRight;
             this.elbowRight = elbowRight;
             this.wristRight = wristRight;
             this.handRight = handRight;
         }
 
-        public SkeletonPoint Head()
+        public SkeletonPoint Head
         {
-            return head;
+            get
+            {
+                return head;
+            }
         }
-        public SkeletonPoint ShoulderCentre()
+        public SkeletonPoint Spine
         {
-            return shoulderCentre;
+            get
+            {
+                return spine;
+            }
         }
-        public SkeletonPoint ShoulderRight()
+        public SkeletonPoint ShoulderRight
         {
-            return shoulderRight;
+            get
+            {
+                return shoulderRight;
+            }
         }
-        public SkeletonPoint ElbowRight()
+        public SkeletonPoint ElbowRight
         {
-            return elbowRight;
+            get
+            {
+                return elbowRight;
+            }
         }
-        public SkeletonPoint WristRight()
+        public SkeletonPoint WristRight
         {
-            return wristRight;
+            get
+            {
+                return wristRight;
+            }
         }
-        public SkeletonPoint HandRight()
+        public SkeletonPoint HandRight
         {
-            return handRight;
+            get
+            {
+                return handRight;
+            }
         }
         
     }

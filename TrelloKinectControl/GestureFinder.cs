@@ -20,19 +20,21 @@ namespace TrelloKinectControl.Gestures
             SkeletonPoints points = GetPointsFrom(skeleton);
 
             System.Diagnostics.Debug.WriteLine("#Processing gesture" + ++gestureCount);
-            System.Diagnostics.Debug.WriteLine(" - Head: X=" + Math.Round(points.Head().X, 2) + ", Y=" + Math.Round(points.Head().Y, 2) + ", Z=" + Math.Round(points.Head().Z, 2));
-            System.Diagnostics.Debug.WriteLine(" - Centre: X=" + Math.Round(points.ShoulderCentre().X, 2) + ", Y=" + Math.Round(points.ShoulderCentre().Y, 2) + ", Z=" + Math.Round(points.ShoulderCentre().Z, 2));
-            System.Diagnostics.Debug.WriteLine(" - Shoulder: X=" + Math.Round(points.ShoulderRight().X, 2) + ", Y=" + Math.Round(points.ShoulderRight().Y, 2) + ", Z=" + Math.Round(points.ShoulderRight().Z, 2));
-            System.Diagnostics.Debug.WriteLine(" - Elbow: X=" + Math.Round(points.ElbowRight().X, 2) + ", Y=" + Math.Round(points.ElbowRight().Y, 2) + ", Z=" + Math.Round(points.ElbowRight().Z, 2));
-            System.Diagnostics.Debug.WriteLine(" - Hand: X=" + Math.Round(points.HandRight().X, 2) + ", Y=" + Math.Round(points.HandRight().Y, 2) + ", Z=" + Math.Round(points.HandRight().Z, 2));
 
-            System.Diagnostics.Debug.Write("# S<->H: " + Math.Round(points.ShoulderRight().Y - points.HandRight().Y, 2));
-            System.Diagnostics.Debug.Write(", H<->E: " + Math.Round(points.HandRight().Y - points.ElbowRight().Y, 2));
-            System.Diagnostics.Debug.Write(", E<->H: " + Math.Round(points.ElbowRight().Y - points.HandRight().Y, 2));
+            DebugPoint("Head", points.Head);
+            DebugPoint("Spine", points.Spine);
+            DebugPoint("Shoulder right", points.ShoulderRight);
+            DebugPoint("Elbow right", points.ElbowRight);
+            DebugPoint("Wrist right", points.WristRight);
+            DebugPoint("Hand right", points.HandRight);
+
+            System.Diagnostics.Debug.Write("# S<->H: " + Math.Round(points.ShoulderRight.Y - points.HandRight.Y, 2));
+            System.Diagnostics.Debug.Write(", H<->E: " + Math.Round(points.HandRight.Y - points.ElbowRight.Y, 2));
+            System.Diagnostics.Debug.Write(", E<->H: " + Math.Round(points.ElbowRight.Y - points.HandRight.Y, 2));
             System.Diagnostics.Debug.Write("\n");
 
             // not interacting if hand not raise
-            if (points.HandRight().Y == 0 && points.HandRight().Z == 0)
+            if (points.HandRight.Y == 0 && points.HandRight.Z == 0)
             {
                 return Gesture.NotInteracting;
             }
@@ -50,12 +52,21 @@ namespace TrelloKinectControl.Gestures
             else if (IsHandNearHead(skeleton))
             {
                 System.Diagnostics.Debug.Print("\t\t\t\tHand near head");
-                return Gesture.View;
+                if (mousePressed)
+                {
+                    mousePressed = false;
+                    return Gesture.View;
+                }
+                return Gesture.None;
             }
-            else if (IsHandNearShoulder(skeleton))
+            else if (IsHandNearSpine(skeleton))
             {
                 System.Diagnostics.Debug.Print("\t\t\t\tHand near shoulder");
-                return Gesture.Assign;
+                if (mousePressed)
+                {
+                    return Gesture.ToggleAssign;
+                }
+                return Gesture.None;
             }
 
             else if (IsArmRetracted(skeleton))
@@ -78,47 +89,47 @@ namespace TrelloKinectControl.Gestures
                 }
                 else
                 {
-                    return FindMovementGesture(points.ElbowRight(), points.HandRight());
+                    return FindMovementGesture(points.ElbowRight, points.HandRight);
                 }
             }
             else
             {
-                return FindMovementGesture(points.ElbowRight(), points.HandRight());
+                return FindMovementGesture(points.ElbowRight, points.HandRight);
             }
         }
 
 
-        private bool IsHandNearShoulder(Skeleton skeleton)
+        private bool IsHandNearSpine(Skeleton skeleton)
         {
 
             SkeletonPoints points = GetPointsFrom(skeleton);
-            return Math.Abs(points.ShoulderCentre().Y - points.HandRight().Y) < 0.05 && Math.Abs(points.ShoulderCentre().Z - points.HandRight().Z) < 0.1;
+            return Math.Abs(points.Spine.Y - points.HandRight.Y) < 0.05 && Math.Abs(points.Spine.Z - points.HandRight.Z) < 0.2;
         }
 
 
         private bool IsHandNearHead(Skeleton skeleton)
         {
             SkeletonPoints points = GetPointsFrom(skeleton);
-            return Math.Abs(points.Head().Y - points.HandRight().Y) < 0.05 && Math.Abs(points.Head().Z - points.HandRight().Z) < 0.1;
+            return Math.Abs(points.Head.Y - points.HandRight.Y) < 0.05 && Math.Abs(points.Head.Z - points.HandRight.Z) < 0.2;
         }
 
         private bool IsArmHangingDown(Skeleton skeleton)
         {
             SkeletonPoints points = GetPointsFrom(skeleton);
-            return points.ShoulderRight().Z - points.HandRight().Z < 0.1;
+            return points.ShoulderRight.Z - points.HandRight.Z < 0.1;
         }
 
         private bool IsArmExtended(Skeleton skeleton)
         {
             SkeletonPoints points = GetPointsFrom(skeleton);
-            return points.HandRight().Z < 0.9;
+            return points.HandRight.Z < 0.9;
         }
 
 
         private bool IsArmRetracted(Skeleton skeleton)
         {
             SkeletonPoints points = GetPointsFrom(skeleton);
-            return points.HandRight().Z > 1.0;
+            return points.HandRight.Z > 1.0;
         }
 
         private Gesture FindMovementGesture(SkeletonPoint rightElbow, SkeletonPoint rightHand)
@@ -149,11 +160,18 @@ namespace TrelloKinectControl.Gestures
         {
             return new SkeletonPoints(
                 skeleton.Joints[JointType.Head].Position,
-                skeleton.Joints[JointType.ShoulderCenter].Position,
+                skeleton.Joints[JointType.Spine].Position,
                 skeleton.Joints[JointType.ShoulderRight].Position,
                 skeleton.Joints[JointType.ElbowRight].Position, 
                 skeleton.Joints[JointType.WristRight].Position,
                 skeleton.Joints[JointType.HandRight].Position);
         }
+
+
+        private void DebugPoint(String name, SkeletonPoint point)
+        {
+            System.Diagnostics.Debug.WriteLine(" - " + name + ": X=" + Math.Round(point.X, 2) + ", Y=" + Math.Round(point.Y, 2) + ", Z=" + Math.Round(point.Z, 2));
+        }
+
     }
 }

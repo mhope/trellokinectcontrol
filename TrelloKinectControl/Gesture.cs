@@ -19,7 +19,7 @@ namespace TrelloKinectControl.Gestures
         PutDown,
         Cancel,
         View,
-        Assign
+        ToggleAssign
     }
 
     public static class GestureExtensions
@@ -66,10 +66,10 @@ namespace TrelloKinectControl.Gestures
                     break;
                 case Gesture.View:
                     KeyboardInterop.Cancel();
+                    MouseInterop.LeftUp();
                     KeyboardInterop.Enter();
                     break;
-                case Gesture.Assign:
-                    KeyboardInterop.Cancel();
+                case Gesture.ToggleAssign:
                     KeyboardInterop.Space();
                     break;
                 default:
