@@ -38,7 +38,7 @@
     <Reference Include="CefSharp.WinForms">
       <HintPath>..\..\CefSharp-1.19.0\CefSharp.WinForms.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kinect, Version=1.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Kinect, Version=1.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -57,6 +57,7 @@
     <Compile Include="GestureFinder.cs" />
     <Compile Include="KinectControl.cs" />
     <Compile Include="MouseInterop.cs" />
+    <Compile Include="SkeletonPoints.cs" />
     <Compile Include="TrelloForm.cs">
       <SubType>Form</SubType>
     </Compile>

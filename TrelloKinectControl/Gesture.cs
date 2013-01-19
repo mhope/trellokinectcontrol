@@ -17,7 +17,9 @@ namespace TrelloKinectControl.Gestures
         NotInteracting,
         PickUp,
         PutDown,
-        Cancel
+        Cancel,
+        View,
+        Assign
     }
 
     public static class GestureExtensions
@@ -61,6 +63,14 @@ namespace TrelloKinectControl.Gestures
                     break;
                 case Gesture.Cancel:
                     KeyboardInterop.Cancel();
+                    break;
+                case Gesture.View:
+                    KeyboardInterop.Cancel();
+                    KeyboardInterop.Enter();
+                    break;
+                case Gesture.Assign:
+                    KeyboardInterop.Cancel();
+                    KeyboardInterop.Space();
                     break;
                 default:
                     break;

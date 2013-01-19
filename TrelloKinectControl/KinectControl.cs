@@ -84,6 +84,7 @@ namespace TrelloKinectControl.Kinect
                         MaxDeviationRadius = 0.04f
                     });
                     kinectSensor.Start();
+                    kinectSensor.ElevationAngle = -5;
                     break;
                 }
             }

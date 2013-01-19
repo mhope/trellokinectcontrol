@@ -13,6 +13,14 @@ namespace TrelloKinectControl.Keyboard
         public static void Cancel(){
             SendKeyPress(KeyCode.ESC);
         }
+        public static void Enter()
+        {
+            SendKeyPress(KeyCode.ENTER);
+        }
+        public static void Space()
+        {
+            SendKeyPress(KeyCode.SPACE_BAR);
+        }
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern uint SendInput(uint numberOfInputs, INPUT[] inputs, int sizeOfInputStructure);

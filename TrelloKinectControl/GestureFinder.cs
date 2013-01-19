@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TrelloKinectControl;
 
 namespace TrelloKinectControl.Gestures
 {
@@ -16,23 +17,22 @@ namespace TrelloKinectControl.Gestures
 
         public Gesture GetGesture(Skeleton skeleton)
         {
-            SkeletonPoint rightElbow;
-            SkeletonPoint rightHand;
-            SkeletonPoint rightShoulder;
-            GetArmFrom(skeleton, out rightElbow, out rightHand, out rightShoulder);
+            SkeletonPoints points = GetPointsFrom(skeleton);
 
             System.Diagnostics.Debug.WriteLine("#Processing gesture" + ++gestureCount);
-            System.Diagnostics.Debug.WriteLine(" - Shoulder: X=" + Math.Round(rightShoulder.X, 2)+ ", Y=" + Math.Round(rightShoulder.Y, 2) + ", Z=" + Math.Round(rightShoulder.Z, 2));
-            System.Diagnostics.Debug.WriteLine(" - Elbow: X=" + Math.Round(rightElbow.X, 2) + ", Y=" + Math.Round(rightElbow.Y, 2) + ", Z=" + Math.Round(rightElbow.Z, 2));
-            System.Diagnostics.Debug.WriteLine(" - Hand: X=" + Math.Round(rightHand.X, 2) + ", Y=" + Math.Round(rightHand.Y, 2) + ", Z=" + Math.Round(rightHand.Z, 2));
+            System.Diagnostics.Debug.WriteLine(" - Head: X=" + Math.Round(points.Head().X, 2) + ", Y=" + Math.Round(points.Head().Y, 2) + ", Z=" + Math.Round(points.Head().Z, 2));
+            System.Diagnostics.Debug.WriteLine(" - Centre: X=" + Math.Round(points.ShoulderCentre().X, 2) + ", Y=" + Math.Round(points.ShoulderCentre().Y, 2) + ", Z=" + Math.Round(points.ShoulderCentre().Z, 2));
+            System.Diagnostics.Debug.WriteLine(" - Shoulder: X=" + Math.Round(points.ShoulderRight().X, 2) + ", Y=" + Math.Round(points.ShoulderRight().Y, 2) + ", Z=" + Math.Round(points.ShoulderRight().Z, 2));
+            System.Diagnostics.Debug.WriteLine(" - Elbow: X=" + Math.Round(points.ElbowRight().X, 2) + ", Y=" + Math.Round(points.ElbowRight().Y, 2) + ", Z=" + Math.Round(points.ElbowRight().Z, 2));
+            System.Diagnostics.Debug.WriteLine(" - Hand: X=" + Math.Round(points.HandRight().X, 2) + ", Y=" + Math.Round(points.HandRight().Y, 2) + ", Z=" + Math.Round(points.HandRight().Z, 2));
 
-            System.Diagnostics.Debug.Write("# S<->H: " + Math.Round(rightShoulder.Y - rightHand.Y, 2));
-            System.Diagnostics.Debug.Write(", H<->E: " + Math.Round(rightHand.Y - rightElbow.Y, 2));
-            System.Diagnostics.Debug.Write(", E<->H: " + Math.Round(rightElbow.Y - rightHand.Y, 2));
+            System.Diagnostics.Debug.Write("# S<->H: " + Math.Round(points.ShoulderRight().Y - points.HandRight().Y, 2));
+            System.Diagnostics.Debug.Write(", H<->E: " + Math.Round(points.HandRight().Y - points.ElbowRight().Y, 2));
+            System.Diagnostics.Debug.Write(", E<->H: " + Math.Round(points.ElbowRight().Y - points.HandRight().Y, 2));
             System.Diagnostics.Debug.Write("\n");
 
             // not interacting if hand not raise
-            if (rightHand.Y == 0 && rightHand.Z == 0)
+            if (points.HandRight().Y == 0 && points.HandRight().Z == 0)
             {
                 return Gesture.NotInteracting;
             }
@@ -47,6 +47,17 @@ namespace TrelloKinectControl.Gestures
                 hasBeenExtended = true;
                 return Gesture.None;
             }
+            else if (IsHandNearHead(skeleton))
+            {
+                System.Diagnostics.Debug.Print("\t\t\t\tHand near head");
+                return Gesture.View;
+            }
+            else if (IsHandNearShoulder(skeleton))
+            {
+                System.Diagnostics.Debug.Print("\t\t\t\tHand near shoulder");
+                return Gesture.Assign;
+            }
+
             else if (IsArmRetracted(skeleton))
             {
                 if (hasBeenExtended)
@@ -67,26 +78,50 @@ namespace TrelloKinectControl.Gestures
                 }
                 else
                 {
-                    return FindMovementGesture(ref rightElbow, ref rightHand);
+                    return FindMovementGesture(points.ElbowRight(), points.HandRight());
                 }
             }
             else
             {
-                return FindMovementGesture(ref rightElbow, ref rightHand);
+                return FindMovementGesture(points.ElbowRight(), points.HandRight());
             }
+        }
+
+
+        private bool IsHandNearShoulder(Skeleton skeleton)
+        {
+
+            SkeletonPoints points = GetPointsFrom(skeleton);
+            return Math.Abs(points.ShoulderCentre().Y - points.HandRight().Y) < 0.05 && Math.Abs(points.ShoulderCentre().Z - points.HandRight().Z) < 0.1;
+        }
+
+
+        private bool IsHandNearHead(Skeleton skeleton)
+        {
+            SkeletonPoints points = GetPointsFrom(skeleton);
+            return Math.Abs(points.Head().Y - points.HandRight().Y) < 0.05 && Math.Abs(points.Head().Z - points.HandRight().Z) < 0.1;
         }
 
         private bool IsArmHangingDown(Skeleton skeleton)
         {
-            SkeletonPoint rightElbow;
-            SkeletonPoint rightShoulder;
-            SkeletonPoint rightHand;
-            GetArmFrom(skeleton, out rightElbow, out rightHand, out rightShoulder);
-            
-            return rightShoulder.Z - rightHand.Z < 0.1;
+            SkeletonPoints points = GetPointsFrom(skeleton);
+            return points.ShoulderRight().Z - points.HandRight().Z < 0.1;
         }
 
-        private static Gesture FindMovementGesture(ref SkeletonPoint rightElbow, ref SkeletonPoint rightHand)
+        private bool IsArmExtended(Skeleton skeleton)
+        {
+            SkeletonPoints points = GetPointsFrom(skeleton);
+            return points.HandRight().Z < 0.9;
+        }
+
+
+        private bool IsArmRetracted(Skeleton skeleton)
+        {
+            SkeletonPoints points = GetPointsFrom(skeleton);
+            return points.HandRight().Z > 1.0;
+        }
+
+        private Gesture FindMovementGesture(SkeletonPoint rightElbow, SkeletonPoint rightHand)
         {
             if (rightHand.Y - rightElbow.Y > 0.1)
             {
@@ -109,41 +144,16 @@ namespace TrelloKinectControl.Gestures
             }
             return Gesture.None;
         }
-
-        private static void GetArmFrom(Skeleton skeleton, out SkeletonPoint rightElbow, out SkeletonPoint rightHand, out SkeletonPoint rightShoulder)
+        
+        private SkeletonPoints GetPointsFrom(Skeleton skeleton)
         {
-            rightElbow = skeleton.Joints.Where(j => j.JointType == JointType.ElbowRight).First().Position;
-            rightHand = skeleton.Joints.Where(j => j.JointType == JointType.HandRight).First().Position;
-            rightShoulder = skeleton.Joints.Where(j => j.JointType == JointType.ShoulderRight).First().Position;
+            return new SkeletonPoints(
+                skeleton.Joints[JointType.Head].Position,
+                skeleton.Joints[JointType.ShoulderCenter].Position,
+                skeleton.Joints[JointType.ShoulderRight].Position,
+                skeleton.Joints[JointType.ElbowRight].Position, 
+                skeleton.Joints[JointType.WristRight].Position,
+                skeleton.Joints[JointType.HandRight].Position);
         }
-
-        private static bool IsArmExtended(Skeleton skeleton)
-        {
-            //double distance =  DistanceFromStraightArm(skeleton);
-            //System.Diagnostics.Debug.WriteLine("$e" + Math.Round(distance, 2));
-            //return distance < 0.05;
-            SkeletonPoint rightElbow;
-            SkeletonPoint rightShoulder;
-            SkeletonPoint rightHand;
-            GetArmFrom(skeleton, out rightElbow, out rightHand, out rightShoulder);
-
-
-            return rightHand.Z < 0.9;
-        }
-
-
-        private static bool IsArmRetracted(Skeleton skeleton)
-        {
-            //double distance = DistanceFromStraightArm(skeleton);
-            //System.Diagnostics.Debug.WriteLine("$r" + Math.Round(distance, 2));
-            //return distance > 0.1;
-            SkeletonPoint rightElbow;
-            SkeletonPoint rightShoulder;
-            SkeletonPoint rightHand;
-            GetArmFrom(skeleton, out rightElbow, out rightHand, out rightShoulder);
-
-
-            return rightHand.Z > 1.0;
-        }
-     }
+    }
 }
