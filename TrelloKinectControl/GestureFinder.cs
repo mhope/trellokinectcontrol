@@ -19,19 +19,13 @@ namespace TrelloKinectControl.Gestures
         {
             SkeletonPoints points = GetPointsFrom(skeleton);
 
-            System.Diagnostics.Debug.WriteLine("#Processing gesture" + ++gestureCount);
-
+            System.Diagnostics.Debug.WriteLine("#Processing gesture " + ++gestureCount);
             DebugPoint("Head", points.Head);
             DebugPoint("Spine", points.Spine);
             DebugPoint("Shoulder right", points.ShoulderRight);
             DebugPoint("Elbow right", points.ElbowRight);
             DebugPoint("Wrist right", points.WristRight);
             DebugPoint("Hand right", points.HandRight);
-
-            System.Diagnostics.Debug.Write("# S<->H: " + Math.Round(points.ShoulderRight.Y - points.HandRight.Y, 2));
-            System.Diagnostics.Debug.Write(", H<->E: " + Math.Round(points.HandRight.Y - points.ElbowRight.Y, 2));
-            System.Diagnostics.Debug.Write(", E<->H: " + Math.Round(points.ElbowRight.Y - points.HandRight.Y, 2));
-            System.Diagnostics.Debug.Write("\n");
 
             // not interacting if hand not raise
             if (points.HandRight.Y == 0 && points.HandRight.Z == 0)
@@ -47,6 +41,7 @@ namespace TrelloKinectControl.Gestures
             {
                 System.Diagnostics.Debug.Print("\t\t\t\tExtended");
                 hasBeenExtended = true;
+
                 return Gesture.None;
             }
             else if (IsHandNearHead(skeleton))
@@ -61,7 +56,7 @@ namespace TrelloKinectControl.Gestures
             }
             else if (IsHandNearSpine(skeleton))
             {
-                System.Diagnostics.Debug.Print("\t\t\t\tHand near shoulder");
+                System.Diagnostics.Debug.Print("\t\t\t\tHand near spine");
                 if (mousePressed)
                 {
                     return Gesture.ToggleAssign;
@@ -98,19 +93,22 @@ namespace TrelloKinectControl.Gestures
             }
         }
 
-
         private bool IsHandNearSpine(Skeleton skeleton)
         {
 
             SkeletonPoints points = GetPointsFrom(skeleton);
-            return Math.Abs(points.Spine.Y - points.HandRight.Y) < 0.05 && Math.Abs(points.Spine.Z - points.HandRight.Z) < 0.2;
+            return Math.Abs(points.Spine.X - points.HandRight.X) < 0.15
+                && Math.Abs(points.Spine.Y - points.HandRight.Y) < 0.1 
+                && Math.Abs(points.Spine.Z - points.HandRight.Z) < 0.3;
         }
 
 
         private bool IsHandNearHead(Skeleton skeleton)
         {
             SkeletonPoints points = GetPointsFrom(skeleton);
-            return Math.Abs(points.Head.Y - points.HandRight.Y) < 0.05 && Math.Abs(points.Head.Z - points.HandRight.Z) < 0.2;
+            return Math.Abs(points.Head.X - points.HandRight.X) < 0.1 
+                && Math.Abs(points.Head.Y - points.HandRight.Y) < 0.25
+                && Math.Abs(points.Head.Z - points.HandRight.Z) < 0.2;
         }
 
         private bool IsArmHangingDown(Skeleton skeleton)
@@ -125,7 +123,6 @@ namespace TrelloKinectControl.Gestures
             return points.HandRight.Z < 0.9;
         }
 
-
         private bool IsArmRetracted(Skeleton skeleton)
         {
             SkeletonPoints points = GetPointsFrom(skeleton);
@@ -134,21 +131,22 @@ namespace TrelloKinectControl.Gestures
 
         private Gesture FindMovementGesture(SkeletonPoint rightElbow, SkeletonPoint rightHand)
         {
-            if (rightHand.Y - rightElbow.Y > 0.1)
+            if (rightHand.Y - rightElbow.Y > 0.1 && rightHand.Y - rightElbow.Y < 0.3)
             {
                 System.Diagnostics.Debug.Print("\t\t\tHand Up");
                 return Gesture.HandUp;
-            } else if (rightElbow.Y - rightHand.Y > 0.1)
+            }
+            else if (rightElbow.Y - rightHand.Y > 0.1 && rightElbow.Y - rightHand.Y < 0.3)
             {
                 System.Diagnostics.Debug.Print("\t\t\tHand Down");
                 return Gesture.HandDown;
             }
-            else if (rightElbow.X - rightHand.X > 0.2)
+            else if (rightElbow.X - rightHand.X > 0.15 && rightElbow.X - rightHand.X < 0.25)
             {
                 System.Diagnostics.Debug.Print("\t\t\tHand Left");
                 return Gesture.HandLeft;
             }
-            else if (rightHand.X - rightElbow.X > 0.2)
+            else if (rightHand.X - rightElbow.X > 0.15 && rightHand.X - rightElbow.X < 0.25)
             {
                 System.Diagnostics.Debug.Print("\t\t\tHand Right");
                 return Gesture.HandRight;
@@ -166,7 +164,6 @@ namespace TrelloKinectControl.Gestures
                 skeleton.Joints[JointType.WristRight].Position,
                 skeleton.Joints[JointType.HandRight].Position);
         }
-
 
         private void DebugPoint(String name, SkeletonPoint point)
         {

@@ -33,6 +33,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.pictureBox6 = new System.Windows.Forms.PictureBox();
+            this.kinectDistanceBar = new System.Windows.Forms.ProgressBar();
             this.pictureBox5 = new System.Windows.Forms.PictureBox();
             this.label6 = new System.Windows.Forms.Label();
             this.pictureBox4 = new System.Windows.Forms.PictureBox();
@@ -44,6 +46,7 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.browserContainer.SuspendLayout();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
@@ -98,6 +101,8 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.White;
+            this.panel1.Controls.Add(this.pictureBox6);
+            this.panel1.Controls.Add(this.kinectDistanceBar);
             this.panel1.Controls.Add(this.pictureBox5);
             this.panel1.Controls.Add(this.label6);
             this.panel1.Controls.Add(this.pictureBox4);
@@ -114,6 +119,27 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(342, 857);
             this.panel1.TabIndex = 5;
+            // 
+            // pictureBox6
+            // 
+            this.pictureBox6.Image = global::TrelloKinectControl.Properties.Resources.kinect_profile1;
+            this.pictureBox6.Location = new System.Drawing.Point(93, 95);
+            this.pictureBox6.Name = "pictureBox6";
+            this.pictureBox6.Size = new System.Drawing.Size(36, 32);
+            this.pictureBox6.TabIndex = 14;
+            this.pictureBox6.TabStop = false;
+            // 
+            // kinectDistanceBar
+            // 
+            this.kinectDistanceBar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.kinectDistanceBar.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.kinectDistanceBar.Location = new System.Drawing.Point(146, 190);
+            this.kinectDistanceBar.Name = "kinectDistanceBar";
+            this.kinectDistanceBar.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.kinectDistanceBar.RightToLeftLayout = true;
+            this.kinectDistanceBar.Size = new System.Drawing.Size(80, 10);
+            this.kinectDistanceBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.kinectDistanceBar.TabIndex = 13;
             // 
             // pictureBox5
             // 
@@ -213,6 +239,7 @@
             this.browserContainer.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
@@ -238,6 +265,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.PictureBox pictureBox5;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.PictureBox pictureBox6;
+        private System.Windows.Forms.ProgressBar kinectDistanceBar;
     }
 }
 

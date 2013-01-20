@@ -36,7 +36,22 @@ namespace TrelloKinectControl
             webView.Dock = DockStyle.Fill;
             browserContainer.ContentPanel.Controls.Add(webView);
 
-            kinectControl = new KinectControl();
+            kinectControl = new KinectControl(this);
+        }
+
+        public void UpdateProgressBar(float distance)
+        {
+            int progessPercent = (int) Math.Round((2.9f - distance) *50.0f);
+            kinectDistanceBar.Value = progessPercent;
+            if (progessPercent == 100)
+            {
+                kinectDistanceBar.ForeColor = Color.FromArgb(128, 255, 128);
+            }
+            else
+            {
+                kinectDistanceBar.ForeColor = Color.FromArgb(255, 192, 128);
+            }
+            kinectDistanceBar.Update();
         }
 
         private void onOffButton_Click(object sender, EventArgs e)

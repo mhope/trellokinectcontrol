@@ -30,6 +30,7 @@ namespace TrelloKinectControl.Gestures
             {
                 case Gesture.PickUp:
                     MouseInterop.LeftDown();
+                    System.Threading.Thread.Sleep(500);
                     MouseInterop.Jiggle();
                     break;
                 case Gesture.PutDown:

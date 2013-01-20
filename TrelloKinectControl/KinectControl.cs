@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using TrelloKinectControl.Gestures;
 using TrelloKinectControl;
+using System.Windows.Forms;
 
 namespace TrelloKinectControl.Kinect
 {
@@ -15,16 +16,18 @@ namespace TrelloKinectControl.Kinect
 
         System.Timers.Timer timer;
         KinectSensor kinectSensor;
-        private double TIMER_DELAY = 800;
+        private double TIMER_DELAY = 700;
 
         private GestureFinder gestureFinder;
-        private bool suspended = false;
         private TrelloGestureManager trelloGestureManager;
-
-        public KinectControl()
+        private bool suspended = false;
+        private BrowserForm browserForm;
+        
+        public KinectControl(BrowserForm browserForm)
         {
             gestureFinder = new GestureFinder();
             trelloGestureManager = new TrelloGestureManager();
+            this.browserForm = browserForm;
         }
 
         public void Start()
@@ -41,18 +44,7 @@ namespace TrelloKinectControl.Kinect
             System.Threading.Thread.Sleep(700);
             StopKinect();
         }
-
-
-        private void _poll_Frame(object sender, ElapsedEventArgs e)
-        {
-            Skeleton skeleton = FindSkeleton();
-            if (skeleton != null && !suspended)
-            {
-                ProcessSkeleton(skeleton);
-            }
-        }
-
-
+        
         private void kinect_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
             if (!suspended)
@@ -90,11 +82,18 @@ namespace TrelloKinectControl.Kinect
 
         private void ProcessSkeleton(Skeleton skeleton)
         {
-            Gesture gesture = gestureFinder.GetGesture(skeleton);
             DelayProcessingNextGesture();
+            Gesture gesture = gestureFinder.GetGesture(skeleton);
             trelloGestureManager.processGesture(gesture);
+            UpdateForm(skeleton);
+
         }
 
+        private void UpdateForm(Skeleton skeleton)
+        {
+            float handDistance = skeleton.Joints[JointType.HandRight].Position.Z;
+            browserForm.UpdateProgressBar(handDistance == 0.0f ? 2.0F : handDistance < 0.9f ? 0.9f : handDistance);
+        }
 
         private void InitializeKinect()
         {
@@ -113,7 +112,6 @@ namespace TrelloKinectControl.Kinect
                 }
             }
         }
-
 
         private static TransformSmoothParameters SmoothingParams()
         {
@@ -147,7 +145,6 @@ namespace TrelloKinectControl.Kinect
             return verySmoothParam;
         }
 
-
         private void InitializeTrello()
         {
             trelloGestureManager.ResetCursorPosition();
@@ -159,7 +156,6 @@ namespace TrelloKinectControl.Kinect
             timer.AutoReset = false;
             timer.Elapsed += new ElapsedEventHandler(_enableProcessing);
         }
-
 
         private void DelayProcessingNextGesture()
         {
@@ -173,7 +169,6 @@ namespace TrelloKinectControl.Kinect
             this.suspended = false;
             System.Diagnostics.Debug.WriteLine("$$ unsuspending");
         }
-
 
         private void StopTimer()
         {
