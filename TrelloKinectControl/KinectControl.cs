@@ -14,9 +14,10 @@ namespace TrelloKinectControl.Kinect
 
         System.Timers.Timer timer;
         KinectSensor kinectSensor;
-        private double TIMER_DELAY = 700;
+        private double TIMER_DELAY = 800;
 
         private GestureFinder gestureFinder;
+        private bool suspended = false;
 
         public KinectControl()
         {
@@ -26,7 +27,7 @@ namespace TrelloKinectControl.Kinect
         public void Start()
         {
             InitializeKinect();
-            //InitializeTimer();
+            InitializeTimer();
             InitializeTrello();
         }
         
@@ -34,7 +35,7 @@ namespace TrelloKinectControl.Kinect
         {
             StopTimer();
             // Give he last timer a chance before stopping the kinect
-            System.Threading.Thread.Sleep((int)TIMER_DELAY);
+            System.Threading.Thread.Sleep(700);
             StopKinect();
         }
 
@@ -42,7 +43,7 @@ namespace TrelloKinectControl.Kinect
         private void _poll_Frame(object sender, ElapsedEventArgs e)
         {
             Skeleton skeleton = FindSkeleton();
-            if (skeleton != null)
+            if (skeleton != null && !suspended)
             {
                 ProcessSkeleton(skeleton);
             }
@@ -51,22 +52,25 @@ namespace TrelloKinectControl.Kinect
 
         private void kinect_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
-            SkeletonFrame frame = e.OpenSkeletonFrame();
-            if (frame == null)
+            if (!suspended)
             {
-                return;
+                SkeletonFrame frame = e.OpenSkeletonFrame();
+                if (frame == null)
+                {
+                    return;
+                }
+                if (frame.SkeletonArrayLength == 0)
+                {
+                    return;
+                }
+                Skeleton[] skeletons = new Skeleton[frame.SkeletonArrayLength];
+                frame.CopySkeletonDataTo(skeletons);
+                Skeleton skeleton = skeletons[0];
+                if (skeleton != null)
+                {
+                    ProcessSkeleton(skeleton);
+                };
             }
-            if (frame.SkeletonArrayLength == 0)
-            {
-                return;
-            }
-            Skeleton[] skeletons = new Skeleton[frame.SkeletonArrayLength];
-            frame.CopySkeletonDataTo(skeletons);
-            Skeleton skeleton = skeletons[0];
-            if (skeleton != null)
-            {
-                ProcessSkeleton(skeleton);
-            };
         }
 
         private Skeleton FindSkeleton()
@@ -84,8 +88,10 @@ namespace TrelloKinectControl.Kinect
         private void ProcessSkeleton(Skeleton skeleton)
         {
             Gesture gesture = gestureFinder.GetGesture(skeleton);
+            DelayProcessingNextGesture();
             gesture.MouseAction(); ;
         }
+
 
         private void InitializeKinect()
         {
@@ -152,9 +158,22 @@ namespace TrelloKinectControl.Kinect
         private void InitializeTimer()
         {
             timer = new System.Timers.Timer(TIMER_DELAY);
-            timer.AutoReset = true;
-            timer.Elapsed += new ElapsedEventHandler(_poll_Frame);
+            timer.AutoReset = false;
+            timer.Elapsed += new ElapsedEventHandler(_enableProcessing);
+        }
+
+
+        private void DelayProcessingNextGesture()
+        {
+            System.Diagnostics.Debug.WriteLine("$$ suspending");
+            this.suspended = true;
             timer.Start();
+        }
+
+        private void _enableProcessing(object sender, ElapsedEventArgs e)
+        {
+            this.suspended = false;
+            System.Diagnostics.Debug.WriteLine("$$ unsuspending");
         }
 
 

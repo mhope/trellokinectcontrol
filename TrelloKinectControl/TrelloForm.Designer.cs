@@ -67,7 +67,7 @@
             // 
             this.onOffButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
             this.onOffButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.onOffButton.Location = new System.Drawing.Point(294, 0);
+            this.onOffButton.Location = new System.Drawing.Point(285, 5);
             this.onOffButton.Name = "onOffButton";
             this.onOffButton.Size = new System.Drawing.Size(48, 32);
             this.onOffButton.TabIndex = 1;
