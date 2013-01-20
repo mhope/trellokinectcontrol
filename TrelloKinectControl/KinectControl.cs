@@ -26,7 +26,7 @@ namespace TrelloKinectControl.Kinect
         public void Start()
         {
             InitializeKinect();
-            InitializeTimer();
+            //InitializeTimer();
             InitializeTrello();
         }
         
@@ -34,7 +34,7 @@ namespace TrelloKinectControl.Kinect
         {
             StopTimer();
             // Give he last timer a chance before stopping the kinect
-            System.Threading.Thread.Sleep(700);
+            System.Threading.Thread.Sleep((int)TIMER_DELAY);
             StopKinect();
         }
 
@@ -46,6 +46,27 @@ namespace TrelloKinectControl.Kinect
             {
                 ProcessSkeleton(skeleton);
             }
+        }
+
+
+        private void kinect_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
+        {
+            SkeletonFrame frame = e.OpenSkeletonFrame();
+            if (frame == null)
+            {
+                return;
+            }
+            if (frame.SkeletonArrayLength == 0)
+            {
+                return;
+            }
+            Skeleton[] skeletons = new Skeleton[frame.SkeletonArrayLength];
+            frame.CopySkeletonDataTo(skeletons);
+            Skeleton skeleton = skeletons[0];
+            if (skeleton != null)
+            {
+                ProcessSkeleton(skeleton);
+            };
         }
 
         private Skeleton FindSkeleton()
@@ -75,19 +96,46 @@ namespace TrelloKinectControl.Kinect
                     kinectSensor = kinect;
                     kinectSensor.SkeletonStream.EnableTrackingInNearRange = true;
                     kinectSensor.SkeletonStream.TrackingMode = SkeletonTrackingMode.Default;
-                    kinectSensor.SkeletonStream.Enable(new TransformSmoothParameters
-                    {
-                        Smoothing = 0.5f,
-                        Correction = 0.5f,
-                        Prediction = 0.5f,
-                        JitterRadius = 0.05f,
-                        MaxDeviationRadius = 0.04f
-                    });
+                    kinectSensor.SkeletonStream.Enable(SmoothingParams());
+                    kinect.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(kinect_SkeletonFrameReady);
                     kinectSensor.Start();
                     kinectSensor.ElevationAngle = -5;
                     break;
                 }
             }
+        }
+
+
+        private static TransformSmoothParameters SmoothingParams()
+        {
+            TransformSmoothParameters verySmoothParam = new TransformSmoothParameters();
+            {
+                verySmoothParam.Smoothing = 0.7f;
+                verySmoothParam.Correction = 0.3f;
+                verySmoothParam.Prediction = 1.0f;
+                verySmoothParam.JitterRadius = 1.0f;
+                verySmoothParam.MaxDeviationRadius = 1.0f;
+            };
+
+            TransformSmoothParameters smoothParam = new TransformSmoothParameters();
+            {
+                smoothParam.Smoothing = 0.5f;
+                smoothParam.Correction = 0.1f;
+                smoothParam.Prediction = 0.5f;
+                smoothParam.JitterRadius = 0.1f;
+                smoothParam.MaxDeviationRadius = 0.1f;
+            };
+
+            TransformSmoothParameters fastSmoothingParam = new TransformSmoothParameters();
+            {
+                fastSmoothingParam.Smoothing = 0.5f;
+                fastSmoothingParam.Correction = 0.5f;
+                fastSmoothingParam.Prediction = 0.5f;
+                fastSmoothingParam.JitterRadius = 0.05f;
+                fastSmoothingParam.MaxDeviationRadius = 0.04f;
+            };
+
+            return verySmoothParam;
         }
 
 
