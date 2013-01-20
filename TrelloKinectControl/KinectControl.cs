@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using TrelloKinectControl.Gestures;
+using TrelloKinectControl;
 
 namespace TrelloKinectControl.Kinect
 {
@@ -18,10 +19,12 @@ namespace TrelloKinectControl.Kinect
 
         private GestureFinder gestureFinder;
         private bool suspended = false;
+        private TrelloGestureManager trelloGestureManager;
 
         public KinectControl()
         {
             gestureFinder = new GestureFinder();
+            trelloGestureManager = new TrelloGestureManager();
         }
 
         public void Start()
@@ -89,7 +92,7 @@ namespace TrelloKinectControl.Kinect
         {
             Gesture gesture = gestureFinder.GetGesture(skeleton);
             DelayProcessingNextGesture();
-            gesture.MouseAction(); ;
+            trelloGestureManager.processGesture(gesture);
         }
 
 
@@ -147,12 +150,7 @@ namespace TrelloKinectControl.Kinect
 
         private void InitializeTrello()
         {
-            PositionCursor();
-        }
-
-        private void PositionCursor()
-        {
-            System.Windows.Forms.Cursor.Position = new System.Drawing.Point(200, 190);
+            trelloGestureManager.ResetCursorPosition();
         }
 
         private void InitializeTimer()

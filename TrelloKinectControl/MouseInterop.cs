@@ -63,64 +63,6 @@ namespace TrelloKinectControl.Mouse
         [DllImport("user32.dll")]
         private static extern uint SendInput(int nInputs, INPUT[] inputs, int size);
 
-        static bool leftClickDown;
-
-        public static void ControlMouse(int dx, int dy, bool leftClick)
-        {
-
-            INPUT[] inputs = new INPUT[2];
-
-            inputs[0] = new INPUT();
-            inputs[0].type = 0;
-            inputs[0].mi.dx = dx;
-            inputs[0].mi.dy = dy;
-            inputs[0].mi.dwFlags = MOUSEEVENTF.MOVE;
-
-            if (!leftClickDown && leftClick)
-            {
-                inputs[1] = new INPUT();
-                inputs[1].type = 0;
-                inputs[1].mi.dwFlags = MOUSEEVENTF.LEFTDOWN;
-                leftClickDown = true;
-            }
-            else if (leftClickDown && !leftClick)
-            {
-                inputs[1] = new INPUT();
-                inputs[1].type = 0;
-                inputs[1].mi.dwFlags = MOUSEEVENTF.LEFTUP;
-                leftClickDown = false;
-            }
-
-            SendInput(inputs.Length, inputs, INPUT.Size);
-        }
-
-        public static void DragMouse(int dx, int dy)
-        {
-            LeftDown();
-            System.Threading.Thread.Sleep(20);
-            Move(0, 3);
-            System.Threading.Thread.Sleep(20);
-            Move(0, 3);
-            System.Threading.Thread.Sleep(20);
-            Move(0, 3);
-            System.Threading.Thread.Sleep(20);
-            Move(0, 3);
-            System.Threading.Thread.Sleep(1000);
-
-            Move(0,10);
-            System.Threading.Thread.Sleep(20);
-            Move(0,10);
-            System.Threading.Thread.Sleep(20);
-            Move(0,10);
-            System.Threading.Thread.Sleep(20);
-            Move(0,10);
-            System.Threading.Thread.Sleep(20);
-            Move(0, 20);
-            System.Threading.Thread.Sleep(1000);
-
-            LeftUp();
-        }
-
         public static void Move(int x, int y)
         {
 
@@ -158,16 +100,16 @@ namespace TrelloKinectControl.Mouse
 
         internal static void Jiggle()
         {
-            int loopCount = 4;
+            int loopCount = 1;
             for (int i = 0; i < loopCount; i++)
             {
-                System.Threading.Thread.Sleep(20);
-                Move(0, 3);
+                System.Threading.Thread.Sleep(200);
+                Move(0, 30);
             }
             for (int j = loopCount; j > 0; j--)
             {
-                System.Threading.Thread.Sleep(20);
-                Move(0, -3);
+                System.Threading.Thread.Sleep(200);
+                Move(0, -30);
             }
         }
     }
