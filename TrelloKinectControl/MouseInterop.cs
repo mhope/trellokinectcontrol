@@ -156,17 +156,17 @@ namespace TrelloKinectControl.Mouse
             SendInput(inputs.Length, inputs, INPUT.Size);
         }
 
-        internal static void Jiggle()
+        public static void Jiggle()
         {
             int loopCount = 5;
             for (int i = 0; i < loopCount; i++)
             {
-                System.Threading.Thread.Sleep(20);
+                System.Threading.Thread.Sleep(10);
                 Move(0, 3);
             }
             for (int j = loopCount; j > 0; j--)
             {
-                System.Threading.Thread.Sleep(20);
+                System.Threading.Thread.Sleep(10);
                 Move(0, -3);
             }
         }

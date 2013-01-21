@@ -59,6 +59,7 @@ namespace TrelloKinectControl.Gestures
                 System.Diagnostics.Debug.Print("\t\t\t\tHand near spine");
                 if (mousePressed)
                 {
+                    mousePressed = false;
                     return Gesture.ToggleAssign;
                 }
                 return Gesture.None;

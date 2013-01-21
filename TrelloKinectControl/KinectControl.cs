@@ -16,7 +16,7 @@ namespace TrelloKinectControl.Kinect
 
         System.Timers.Timer timer;
         KinectSensor kinectSensor;
-        private double TIMER_DELAY = 700;
+        private double TIMER_DELAY = 500;
 
         private GestureFinder gestureFinder;
         private TrelloGestureManager trelloGestureManager;
@@ -82,9 +82,12 @@ namespace TrelloKinectControl.Kinect
 
         private void ProcessSkeleton(Skeleton skeleton)
         {
-            DelayProcessingNextGesture();
             Gesture gesture = gestureFinder.GetGesture(skeleton);
-            trelloGestureManager.processGesture(gesture);
+            if (gesture == Gesture.ToggleAssign || gesture == Gesture.View)
+            {
+                DelayProcessingNextGesture();
+            }
+            trelloGestureManager.ProcessGesture(gesture);
             UpdateForm(skeleton);
 
         }
@@ -107,7 +110,6 @@ namespace TrelloKinectControl.Kinect
                     kinectSensor.SkeletonStream.Enable(SmoothingParams());
                     kinect.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(kinect_SkeletonFrameReady);
                     kinectSensor.Start();
-                    kinectSensor.ElevationAngle = -5;
                     break;
                 }
             }

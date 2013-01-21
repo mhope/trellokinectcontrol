@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Timers;
 using TrelloKinectControl.Keyboard;
 using TrelloKinectControl.Mouse;
 
@@ -11,31 +12,41 @@ namespace TrelloKinectControl.Gestures
     class TrelloGestureManager
     {
         private static readonly int INITIAL_X = 200;
-        private static readonly int INITIAL_Y = 195;
-        private static readonly int CARD_HEIGHT = 32;
-        private static readonly int COLUMN_WIDTH = 120;
+        private static readonly int INITIAL_Y = 190;
 
         private Point currentPoint = new System.Drawing.Point(INITIAL_X, INITIAL_Y);
-        private LinkedList<int> rowYList;
-        private LinkedList<int> columnXList;
+        private System.Timers.Timer mouseTimer;
+        private System.Timers.Timer keyboardTimer;
+        private double MOUSE_DELAY = 10.0;
+        private double KEYBOARD_DELAY = 100.0;
 
         public TrelloGestureManager()
         {
-            InitializePositionArrays();
+            InitializeCallbacks();
         }
 
-        internal void processGesture(Gesture gesture)
+        private void InitializeCallbacks()
+        {
+            mouseTimer = new System.Timers.Timer(MOUSE_DELAY);
+            mouseTimer.AutoReset = true;
+            mouseTimer.Elapsed += new ElapsedEventHandler(_post_Processing_mouse);
+
+            keyboardTimer = new System.Timers.Timer(KEYBOARD_DELAY);
+            keyboardTimer.AutoReset = true;
+            keyboardTimer.Elapsed += new ElapsedEventHandler(_post_Processing_keyboard);
+        }
+
+
+        internal void ProcessGesture(Gesture gesture)
         {
             switch (gesture)
             {
                 case Gesture.PickUp:
-                    MouseInterop.LeftDown();
-                    System.Threading.Thread.Sleep(500);
-                    MouseInterop.Jiggle();
+                    MouseInterop.LeftDown();            
+                    mouseTimer.Start();
                     break;
                 case Gesture.PutDown:
                     MouseInterop.LeftUp();
-                    ResetCursorPosition();
                     break;
                 case Gesture.HandUp:
                     MouseInterop.Move(0, GetNextUpY());                    
@@ -55,42 +66,43 @@ namespace TrelloKinectControl.Gestures
                 case Gesture.View:
                     KeyboardInterop.Cancel();
                     MouseInterop.LeftUp();
-                    KeyboardInterop.Enter();
+                    keyboardTimer.Start();
                     break;
                 case Gesture.ToggleAssign:
+                    KeyboardInterop.Cancel();
+                    System.Threading.Thread.Sleep(100);
+                    MouseInterop.LeftUp();
+                    System.Threading.Thread.Sleep(100);
                     KeyboardInterop.Space();
                     break;
                 default:
                     break;
+
             }
         }
 
+        private void _post_Processing_mouse(object sender, ElapsedEventArgs e)
+        {
+            MouseInterop.Jiggle();
+            mouseTimer.Stop();
+        }
+
+        private void _post_Processing_keyboard(object sender, ElapsedEventArgs e)
+        {
+            KeyboardInterop.Enter();
+            keyboardTimer.Stop();
+        }
+        
         private int GetNextRightX()
         {
-            LinkedListNode<int> xNode = columnXList.Find(currentPoint.X);
-            LinkedListNode<int> rightNode = xNode.Next;
-            if (rightNode != null)
-            {
-                int change = rightNode.Value - currentPoint.X;
-                currentPoint = new Point(rightNode.Value, currentPoint.Y);
-                return change;
-            }
-            else
-            {
-                return 0;
-            }
+            return 6;
         }
 
         private int GetNextLeftX()
         {
-
-            LinkedListNode<int> xNode = columnXList.Find(currentPoint.X);
-            LinkedListNode<int> leftNode = xNode.Previous;
-            if (leftNode != null)
+            if (System.Windows.Forms.Cursor.Position.X > INITIAL_X-50)
             {
-                int change = leftNode.Value - currentPoint.X;
-                currentPoint = new Point(leftNode.Value, currentPoint.Y);
-                return change;
+                return -6;
             }
             else
             {
@@ -100,30 +112,15 @@ namespace TrelloKinectControl.Gestures
 
         private int GetNextDownY()
         {
-            LinkedListNode<int> yNode = rowYList.Find(currentPoint.Y);
-            LinkedListNode<int> lowerNode = yNode.Next;
-            if (lowerNode != null)
-            {
-                int change = lowerNode.Value - currentPoint.Y;
-                currentPoint = new Point(currentPoint.X, lowerNode.Value);
-                return change;
-            }
-            else
-            {
-                return 0;
-            }
+            return 3;
         }
 
         private int GetNextUpY()
         {
-
-            LinkedListNode<int> yNode = rowYList.Find(currentPoint.Y);
-            LinkedListNode<int> higherNode = yNode.Previous;
-            if (higherNode != null)
+            
+            if (System.Windows.Forms.Cursor.Position.Y > INITIAL_Y -10)
             {
-                int change = higherNode.Value - currentPoint.Y;
-                currentPoint = new Point(currentPoint.X, higherNode.Value);
-                return change;
+                return -3;
             }
             else
             {
@@ -135,28 +132,5 @@ namespace TrelloKinectControl.Gestures
         {
             System.Windows.Forms.Cursor.Position = currentPoint;
         }
-
-
-
-        private void InitializePositionArrays()
-        {
-            int[] yArray = new int[8];
-            int[] xArray = new int[3];
-            int y = INITIAL_Y;
-            for (int i = 0; i < 8; i++)
-            {
-                yArray[i] = y;
-                y += CARD_HEIGHT;
-            }
-            int x = INITIAL_X;
-            for (int i = 0; i < 3; i++)
-            {
-                xArray[i] = x;
-                x += COLUMN_WIDTH;
-            }
-            rowYList = new LinkedList<int>(yArray);
-            columnXList = new LinkedList<int>(xArray);
-        }
-
     }
 }
